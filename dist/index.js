@@ -1,198 +1,288 @@
-import React, { Component } from 'react';
-import UrlPattern from 'url-pattern';
-import _ from 'lodash';
-import path from 'path';
-const qs = require('qs');
-import NotFound from './notFound';
-import EmptyTemplate from './emptyTemplate';
-export class Route {
-    constructor(props) {
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_1 = require("react");
+var url_pattern_1 = require("url-pattern");
+var lodash_1 = require("lodash");
+var path_1 = require("path");
+var qs = require('qs');
+var notFound_1 = require("./notFound");
+var emptyTemplate_1 = require("./emptyTemplate");
+var Route = /** @class */ (function () {
+    function Route(props) {
         this.name = props.name;
         this.path = props.path;
         this.Component = props.component;
-        this.templates = [props.template || EmptyTemplate];
+        this.templates = [props.template || emptyTemplate_1.default];
         this.beforeRender = props.beforeRender || function () { };
         this.inject = props.inject || {};
         this.urn = this.name;
     }
-    addTemplate(template) {
+    Route.prototype.addTemplate = function (template) {
         this.templates.push(template);
         return this;
-    }
-    addParams(params, url) {
-        const queryStartIndex = url.indexOf('?');
-        const queryParams = queryStartIndex !== -1 ? qs.parse(url.substring(queryStartIndex, url.length)) : {};
-        this.params = Object.assign({}, this.params, queryParams, params);
+    };
+    Route.prototype.addParams = function (params, url) {
+        var queryStartIndex = url.indexOf('?');
+        var queryParams = queryStartIndex !== -1 ? qs.parse(url.substring(queryStartIndex, url.length)) : {};
+        this.params = __assign({}, this.params, queryParams, params);
         return this;
-    }
-    inheritParentData(parent) {
+    };
+    Route.prototype.inheritParentData = function (parent) {
         this.urn = parent.urn ? parent.urn + '.' + this.urn : this.urn;
-        this.path = path.join(parent.path, this.path);
-        this.templates = [...parent.templates, ...this.templates];
+        this.path = path_1.default.join(parent.path, this.path);
+        this.templates = parent.templates.concat(this.templates);
         return this;
-    }
-    formatForInject() {
+    };
+    Route.prototype.formatForInject = function () {
         return {
             urn: this.urn,
             params: this.params,
             inject: this.inject,
         };
-    }
-}
-export class RootCollection {
-    constructor(props) {
+    };
+    return Route;
+}());
+exports.Route = Route;
+var RootCollection = /** @class */ (function () {
+    function RootCollection(props) {
         this.name = '';
         this.urn = '';
         this.path = props.path || '';
-        this.templates = [props.template || EmptyTemplate];
+        this.templates = [props.template || emptyTemplate_1.default];
         this.routes = [];
         this.collections = [];
-        this.notFound = props.notFound || NotFound;
+        this.notFound = props.notFound || notFound_1.default;
     }
-    addRoute(route) {
+    RootCollection.prototype.addRoute = function (route) {
         this.routes.push(route);
         return this;
-    }
-    addCollection(collection) {
+    };
+    RootCollection.prototype.addCollection = function (collection) {
         this.collections.push(collection);
         return this;
-    }
-    build() {
-        for (const collection of this.collections) {
+    };
+    RootCollection.prototype.build = function () {
+        for (var _i = 0, _a = this.collections; _i < _a.length; _i++) {
+            var collection = _a[_i];
             collection.inheritParentData(this);
         }
-        for (const route of this.routes) {
+        for (var _b = 0, _c = this.routes; _b < _c.length; _b++) {
+            var route = _c[_b];
             route.inheritParentData(this);
         }
         return this;
-    }
-}
-export class Collection {
-    constructor(props) {
+    };
+    return RootCollection;
+}());
+exports.RootCollection = RootCollection;
+var Collection = /** @class */ (function () {
+    function Collection(props) {
         this.name = props.name;
         this.urn = props.name;
         this.path = props.path;
-        this.templates = [props.template || EmptyTemplate];
+        this.templates = [props.template || emptyTemplate_1.default];
         this.routes = [];
         this.collections = [];
     }
-    addRoute(route) {
+    Collection.prototype.addRoute = function (route) {
         this.routes.push(route);
         return this;
-    }
-    addCollection(collection) {
+    };
+    Collection.prototype.addCollection = function (collection) {
         this.collections.push(collection);
         return this;
-    }
-    addTemplate(template) {
+    };
+    Collection.prototype.addTemplate = function (template) {
         this.templates.push(template);
         return this;
-    }
-    inheritParentData(parent) {
+    };
+    Collection.prototype.inheritParentData = function (parent) {
         this.urn = parent.urn ? parent.urn + '.' + this.urn : this.urn;
-        this.path = path.join(parent.path, this.path);
-        this.templates = [...parent.templates, ...this.templates];
-        for (const collection of this.collections) {
+        this.path = path_1.default.join(parent.path, this.path);
+        this.templates = parent.templates.concat(this.templates);
+        for (var _i = 0, _a = this.collections; _i < _a.length; _i++) {
+            var collection = _a[_i];
             collection.inheritParentData(this);
         }
-        for (const route of this.routes) {
+        for (var _b = 0, _c = this.routes; _b < _c.length; _b++) {
+            var route = _c[_b];
             route.inheritParentData(this);
         }
         return this;
+    };
+    return Collection;
+}());
+exports.Collection = Collection;
+var TemplateBuilder = /** @class */ (function (_super) {
+    __extends(TemplateBuilder, _super);
+    function TemplateBuilder() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-}
-class TemplateBuilder extends Component {
-    render() {
-        let templates = this.props.templates;
-        const Template = templates[0];
+    TemplateBuilder.prototype.render = function () {
+        var templates = this.props.templates;
+        var Template = templates[0];
         if (!Template) {
             return this.props.children;
         }
         else if (0 < templates.length) {
-            return (React.createElement(Template, { route: this.props.route },
-                React.createElement(TemplateBuilder, { templates: _.tail(templates), route: this.props.route }, this.props.children)));
+            return (react_1.default.createElement(Template, { route: this.props.route },
+                react_1.default.createElement(TemplateBuilder, { templates: lodash_1.default.tail(templates), route: this.props.route }, this.props.children)));
         }
         else {
-            return React.createElement(Template, { route: this.props.route }, this.props.children);
+            return react_1.default.createElement(Template, { route: this.props.route }, this.props.children);
         }
+    };
+    return TemplateBuilder;
+}(react_1.Component));
+var RouteRenderer = /** @class */ (function (_super) {
+    __extends(RouteRenderer, _super);
+    function RouteRenderer() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.state = { route: null };
+        return _this;
     }
-}
-class RouteRenderer extends Component {
-    constructor() {
-        super(...arguments);
-        this.state = { route: null };
-    }
-    async beforeRender(props) {
-        await props.route.beforeRender();
-        this.setState({ route: props.route });
-    }
-    componentWillMount() {
+    RouteRenderer.prototype.beforeRender = function (props) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, props.route.beforeRender()];
+                    case 1:
+                        _a.sent();
+                        this.setState({ route: props.route });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    RouteRenderer.prototype.componentWillMount = function () {
         this.beforeRender(this.props);
-    }
-    componentWillReceiveProps(newProps) {
+    };
+    RouteRenderer.prototype.componentWillReceiveProps = function (newProps) {
         if (newProps.route.path !== this.props.route.path) {
             this.beforeRender(newProps);
         }
-    }
-    render() {
-        const route = this.state.route;
+    };
+    RouteRenderer.prototype.render = function () {
+        var route = this.state.route;
         if (!route) {
             return null;
         }
-        const ComponentToRender = route.Component;
-        return React.createElement(TemplateBuilder, { templates: route.templates, route: route.formatForInject() },
-            React.createElement(ComponentToRender, { route: route.formatForInject() }));
-    }
-}
-export class Router extends React.Component {
-    constructor(props) {
-        super(props);
-        this.routes = props.routes;
-        let w = window;
-        this.state = { route: this.routeTo(new URL(w.location.href).pathname, this.routes) };
-        w.onpopstate = () => {
-            this.setState({ route: this.routeTo(new URL(w.location.href).pathname, this.routes) });
+        var ComponentToRender = route.Component;
+        return react_1.default.createElement(TemplateBuilder, { templates: route.templates, route: route.formatForInject() },
+            react_1.default.createElement(ComponentToRender, { route: route.formatForInject() }));
+    };
+    return RouteRenderer;
+}(react_1.Component));
+var Router = /** @class */ (function (_super) {
+    __extends(Router, _super);
+    function Router(props) {
+        var _this = _super.call(this, props) || this;
+        _this.routes = props.routes;
+        var w = window;
+        _this.state = { route: _this.routeTo(new URL(w.location.href).pathname, _this.routes) };
+        w.onpopstate = function () {
+            _this.setState({ route: _this.routeTo(new URL(w.location.href).pathname, _this.routes) });
         };
-        w.onpushstate = () => {
-            this.setState({ route: this.routeTo(new URL(w.location.href).pathname, this.routes) });
+        w.onpushstate = function () {
+            _this.setState({ route: _this.routeTo(new URL(w.location.href).pathname, _this.routes) });
         };
+        return _this;
     }
-    routeTo(url, collection) {
+    Router.prototype.routeTo = function (url, collection) {
         url = 1 < url.length && url[url.length - 1] === '/' ? url.substring(0, url.length - 1) : url;
-        for (const route of collection.routes) {
-            const routePath = route.path;
-            const uri = 1 < routePath.length && routePath[routePath.length - 1] === '/' ? routePath.substring(0, routePath.length - 1) : routePath;
-            const pattern = new UrlPattern(uri);
-            const params = pattern.match(url);
+        for (var _i = 0, _a = collection.routes; _i < _a.length; _i++) {
+            var route = _a[_i];
+            var routePath = route.path;
+            var uri = 1 < routePath.length && routePath[routePath.length - 1] === '/' ? routePath.substring(0, routePath.length - 1) : routePath;
+            var pattern = new url_pattern_1.default(uri);
+            var params = pattern.match(url);
             if (params) {
                 return route.addParams(params, url);
             }
         }
-        for (const subCollection of collection.collections) {
-            const pattern = new UrlPattern(path.join(subCollection.path, '*'));
-            const params = pattern.match(path.join(url, '/'));
+        for (var _b = 0, _c = collection.collections; _b < _c.length; _b++) {
+            var subCollection = _c[_b];
+            var pattern = new url_pattern_1.default(path_1.default.join(subCollection.path, '*'));
+            var params = pattern.match(path_1.default.join(url, '/'));
             if (params) {
                 return this.routeTo(url, subCollection);
             }
         }
         return new Route({ name: 'notFound', path: '/not-found', component: this.routes.notFound });
-    }
-    render() {
-        return React.createElement(RouteRenderer, { route: this.state.route });
-    }
-}
-const getRouteFromPtr = (ptrArr, collection) => {
-    const ptr = ptrArr[0];
-    const tail = _.tail(ptrArr);
+    };
+    Router.prototype.render = function () {
+        return react_1.default.createElement(RouteRenderer, { route: this.state.route });
+    };
+    return Router;
+}(react_1.default.Component));
+exports.Router = Router;
+var getRouteFromPtr = function (ptrArr, collection) {
+    var ptr = ptrArr[0];
+    var tail = lodash_1.default.tail(ptrArr);
     if (tail.length) {
-        for (const subCollection of collection.collections) {
+        for (var _i = 0, _a = collection.collections; _i < _a.length; _i++) {
+            var subCollection = _a[_i];
             if (ptr === subCollection.name) {
                 return getRouteFromPtr(tail, subCollection);
             }
         }
     }
     else {
-        for (const route of collection.routes) {
+        for (var _b = 0, _c = collection.routes; _b < _c.length; _b++) {
+            var route = _c[_b];
             if (ptr === route.name) {
                 return route;
             }
@@ -201,25 +291,25 @@ const getRouteFromPtr = (ptrArr, collection) => {
     return false;
 };
 /* go to a view from a route */
-export const createGo = (routes) => {
-    return (ptr, params, e) => {
+exports.createGo = function (routes) {
+    return function (ptr, params, e) {
         if (e) {
             e.preventDefault();
         }
-        const route = getRouteFromPtr(ptr.split('.'), routes);
+        var route = getRouteFromPtr(ptr.split('.'), routes);
         if (route) {
-            const pattern = new UrlPattern(route.path);
-            let urlWithParams = pattern.stringify(params);
-            const queryKeys = _.difference(_.keys(params), _.keys(urlWithParams));
+            var pattern = new url_pattern_1.default(route.path);
+            var urlWithParams = pattern.stringify(params);
+            var queryKeys = lodash_1.default.difference(lodash_1.default.keys(params), lodash_1.default.keys(urlWithParams));
             if (queryKeys.length) {
-                urlWithParams += '?' + qs.stringify(_.pick(params, queryKeys));
+                urlWithParams += '?' + qs.stringify(lodash_1.default.pick(params, queryKeys));
             }
-            let w = window;
+            var w = window;
             w.history.pushState(params, '', urlWithParams);
             w.onpushstate(params);
         }
         else {
-            console.log(`Route ${ptr} not found!`);
+            console.log("Route " + ptr + " not found!");
         }
     };
 };

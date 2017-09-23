@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "description": "a router for react",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "start": "tsc",
+    "prepublishOnly": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

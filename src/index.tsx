@@ -6,10 +6,10 @@ const qs = require('qs')
 import NotFound from './notFound'
 import EmptyTemplate from './emptyTemplate'
 
-type Promisable = () => Promise<any> | any
+export type Promisable = () => Promise<any> | any
 
-type RouteInject = { [key: string]: any }
-interface RouteProps {
+export type RouteInject = { [key: string]: any }
+export interface RouteProps {
     name: string
     path: string
     component: React.ComponentType<any>
@@ -18,7 +18,7 @@ interface RouteProps {
     inject?: RouteInject
 }
 
-type RouteParams = { [key: string]: any }
+export type RouteParams = { [key: string]: any }
 export interface InjectedRoute {
     urn: string
     params: RouteParams
@@ -76,7 +76,7 @@ export class Route {
     }
 }
 
-interface RootCollectionProps {
+export interface RootCollectionProps {
     path?: string,
     notFound?: React.ComponentType<any>,
     template?: React.ComponentType<any>,
@@ -124,7 +124,7 @@ export class RootCollection {
     }
 }
 
-interface CollectionProps {
+export interface CollectionProps {
     name: string,
     path: string,
     template?: React.ComponentType<any>
@@ -180,14 +180,14 @@ export class Collection {
 }
 
 
-interface RouterProps { routes: RootCollection }
-interface RouterState { route: Route }
+export interface RouterProps { routes: RootCollection }
+export interface RouterState { route: Route }
 
-interface TemplateProps {
+export interface TemplateProps {
     route: InjectedRoute,
 }
 
-interface TemplateBuilderProps {
+export interface TemplateBuilderProps {
     route: InjectedRoute,
     templates: Array<React.ComponentType<TemplateProps>>,
     children: React.ReactElement<any>,
@@ -214,11 +214,11 @@ class TemplateBuilder extends Component<TemplateBuilderProps> {
     }
 }
 
-interface RouteRendererProps {
+export interface RouteRendererProps {
     route: Route
 }
 
-interface RouteRendererState {
+export interface RouteRendererState {
     route: Route | null
 }
 

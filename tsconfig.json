@@ -1,16 +1,18 @@
 {
     "compilerOptions": {
         "outDir": "./dist/",
+        "target": "es5",
+        "module": "commonjs",
         "sourceMap": false,
         "noImplicitAny": true,
         "strictNullChecks": true,
+        "declaration": true,
         "moduleResolution": "node",
         "allowSyntheticDefaultImports": true,
         "experimentalDecorators": true,
         "jsx": "react",
         "noUnusedParameters": false,
         "noUnusedLocals": false,
-        "target": "es2017",
         "lib": [
             "dom",
             "es7"
