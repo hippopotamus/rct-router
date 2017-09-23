@@ -49,8 +49,8 @@ export declare class RootCollection {
     notFound: React.ComponentType<any>;
     urn: string;
     constructor(props: RootCollectionProps);
-    addRoute(route: RouteProps): this;
-    addCollection(collection: CollectionProps): this;
+    addRoute(route: Route): this;
+    addCollection(collection: Collection): this;
     build(): this;
 }
 export interface CollectionProps {
@@ -66,8 +66,8 @@ export declare class Collection {
     routes: Array<Route>;
     collections: Array<Collection>;
     constructor(props: CollectionProps);
-    addRoute(route: RouteProps): this;
-    addCollection(collection: CollectionProps): this;
+    addRoute(route: Route): this;
+    addCollection(collection: Collection): this;
     addTemplate(template: React.ComponentType<any>): this;
     inheritParentData(parent: Collection | RootCollection): this;
 }

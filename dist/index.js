@@ -107,11 +107,11 @@ var RootCollection = /** @class */ (function () {
         this.notFound = props.notFound || notFound_1.default;
     }
     RootCollection.prototype.addRoute = function (route) {
-        this.routes.push(new Route(route));
+        this.routes.push(route);
         return this;
     };
     RootCollection.prototype.addCollection = function (collection) {
-        this.collections.push(new Collection(collection));
+        this.collections.push(collection);
         return this;
     };
     RootCollection.prototype.build = function () {
@@ -138,11 +138,11 @@ var Collection = /** @class */ (function () {
         this.collections = [];
     }
     Collection.prototype.addRoute = function (route) {
-        this.routes.push(new Route(route));
+        this.routes.push(route);
         return this;
     };
     Collection.prototype.addCollection = function (collection) {
-        this.collections.push(new Collection(collection));
+        this.collections.push(collection);
         return this;
     };
     Collection.prototype.addTemplate = function (template) {

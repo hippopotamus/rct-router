@@ -101,13 +101,13 @@ export class RootCollection {
         this.notFound = props.notFound || NotFound
     }
 
-    addRoute(route: RouteProps) {
-        this.routes.push(new Route(route))
+    addRoute(route: Route) {
+        this.routes.push(route)
         return this
     }
 
-    addCollection(collection: CollectionProps) {
-        this.collections.push(new Collection(collection))
+    addCollection(collection: Collection) {
+        this.collections.push(collection)
         return this
     }
 
@@ -147,13 +147,13 @@ export class Collection {
         this.collections = []
     }
 
-    addRoute(route: RouteProps) {
-        this.routes.push(new Route(route))
+    addRoute(route: Route) {
+        this.routes.push(route)
         return this
     }
 
-    addCollection(collection: CollectionProps) {
-        this.collections.push(new Collection(collection))
+    addCollection(collection: Collection) {
+        this.collections.push(collection)
         return this
     }
 
