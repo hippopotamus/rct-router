@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
-import UrlPattern from 'url-pattern'
-import _ from 'lodash'
-import path from 'path'
+import * as React from 'react'
+import * as UrlPattern from 'url-pattern'
+import * as _ from 'lodash'
+import * as path from 'path'
 const qs = require('qs')
 import NotFound from './notFound'
 import EmptyTemplate from './emptyTemplate'
@@ -193,7 +193,7 @@ export interface TemplateBuilderProps {
     children: React.ReactElement<any>,
 }
 
-class TemplateBuilder extends Component<TemplateBuilderProps> {
+class TemplateBuilder extends React.Component<TemplateBuilderProps> {
     render(): any {
         let templates = this.props.templates
         const Template = templates[0]
@@ -222,7 +222,7 @@ export interface RouteRendererState {
     route: Route | null
 }
 
-class RouteRenderer extends Component<RouteRendererProps, RouteRendererState> {
+class RouteRenderer extends React.Component<RouteRendererProps, RouteRendererState> {
     state: RouteRendererState = { route: null }
 
     async beforeRender(props: RouteRendererProps) {

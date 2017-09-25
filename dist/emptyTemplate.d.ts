@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import React from 'react';
+import * as React from 'react';
 export declare type EmptyTemplateProps = {
     children: React.ReactElement<any>;
 };

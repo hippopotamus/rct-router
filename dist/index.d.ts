@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import React from 'react';
+import * as React from 'react';
 export declare type Promisable = () => Promise<any> | any;
 export declare type RouteInject = {
     [key: string]: any;

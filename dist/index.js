@@ -53,10 +53,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var react_1 = require("react");
-var url_pattern_1 = require("url-pattern");
-var lodash_1 = require("lodash");
-var path_1 = require("path");
+var React = require("react");
+var UrlPattern = require("url-pattern");
+var _ = require("lodash");
+var path = require("path");
 var qs = require('qs');
 var notFound_1 = require("./notFound");
 var emptyTemplate_1 = require("./emptyTemplate");
@@ -82,7 +82,7 @@ var Route = /** @class */ (function () {
     };
     Route.prototype.inheritParentData = function (parent) {
         this.urn = parent.urn ? parent.urn + '.' + this.urn : this.urn;
-        this.path = path_1.default.join(parent.path, this.path);
+        this.path = path.join(parent.path, this.path);
         this.templates = parent.templates.concat(this.templates);
         return this;
     };
@@ -151,7 +151,7 @@ var Collection = /** @class */ (function () {
     };
     Collection.prototype.inheritParentData = function (parent) {
         this.urn = parent.urn ? parent.urn + '.' + this.urn : this.urn;
-        this.path = path_1.default.join(parent.path, this.path);
+        this.path = path.join(parent.path, this.path);
         this.templates = parent.templates.concat(this.templates);
         for (var _i = 0, _a = this.collections; _i < _a.length; _i++) {
             var collection = _a[_i];
@@ -178,15 +178,15 @@ var TemplateBuilder = /** @class */ (function (_super) {
             return this.props.children;
         }
         else if (0 < templates.length) {
-            return (react_1.default.createElement(Template, { route: this.props.route },
-                react_1.default.createElement(TemplateBuilder, { templates: lodash_1.default.tail(templates), route: this.props.route }, this.props.children)));
+            return (React.createElement(Template, { route: this.props.route },
+                React.createElement(TemplateBuilder, { templates: _.tail(templates), route: this.props.route }, this.props.children)));
         }
         else {
-            return react_1.default.createElement(Template, { route: this.props.route }, this.props.children);
+            return React.createElement(Template, { route: this.props.route }, this.props.children);
         }
     };
     return TemplateBuilder;
-}(react_1.Component));
+}(React.Component));
 var RouteRenderer = /** @class */ (function (_super) {
     __extends(RouteRenderer, _super);
     function RouteRenderer() {
@@ -221,11 +221,11 @@ var RouteRenderer = /** @class */ (function (_super) {
             return null;
         }
         var ComponentToRender = route.Component;
-        return react_1.default.createElement(TemplateBuilder, { templates: route.templates, route: route.formatForInject() },
-            react_1.default.createElement(ComponentToRender, { route: route.formatForInject() }));
+        return React.createElement(TemplateBuilder, { templates: route.templates, route: route.formatForInject() },
+            React.createElement(ComponentToRender, { route: route.formatForInject() }));
     };
     return RouteRenderer;
-}(react_1.Component));
+}(React.Component));
 var Router = /** @class */ (function (_super) {
     __extends(Router, _super);
     function Router(props) {
@@ -247,7 +247,7 @@ var Router = /** @class */ (function (_super) {
             var route = _a[_i];
             var routePath = route.path;
             var uri = 1 < routePath.length && routePath[routePath.length - 1] === '/' ? routePath.substring(0, routePath.length - 1) : routePath;
-            var pattern = new url_pattern_1.default(uri);
+            var pattern = new UrlPattern(uri);
             var params = pattern.match(url);
             if (params) {
                 return route.addParams(params, url);
@@ -255,8 +255,8 @@ var Router = /** @class */ (function (_super) {
         }
         for (var _b = 0, _c = collection.collections; _b < _c.length; _b++) {
             var subCollection = _c[_b];
-            var pattern = new url_pattern_1.default(path_1.default.join(subCollection.path, '*'));
-            var params = pattern.match(path_1.default.join(url, '/'));
+            var pattern = new UrlPattern(path.join(subCollection.path, '*'));
+            var params = pattern.match(path.join(url, '/'));
             if (params) {
                 return this.routeTo(url, subCollection);
             }
@@ -264,14 +264,14 @@ var Router = /** @class */ (function (_super) {
         return new Route({ name: 'notFound', path: '/not-found', component: this.routes.notFound });
     };
     Router.prototype.render = function () {
-        return react_1.default.createElement(RouteRenderer, { route: this.state.route });
+        return React.createElement(RouteRenderer, { route: this.state.route });
     };
     return Router;
-}(react_1.default.Component));
+}(React.Component));
 exports.Router = Router;
 var getRouteFromPtr = function (ptrArr, collection) {
     var ptr = ptrArr[0];
-    var tail = lodash_1.default.tail(ptrArr);
+    var tail = _.tail(ptrArr);
     if (tail.length) {
         for (var _i = 0, _a = collection.collections; _i < _a.length; _i++) {
             var subCollection = _a[_i];
@@ -298,11 +298,11 @@ exports.createGo = function (routes) {
         }
         var route = getRouteFromPtr(ptr.split('.'), routes);
         if (route) {
-            var pattern = new url_pattern_1.default(route.path);
+            var pattern = new UrlPattern(route.path);
             var urlWithParams = pattern.stringify(params);
-            var queryKeys = lodash_1.default.difference(lodash_1.default.keys(params), lodash_1.default.keys(urlWithParams));
+            var queryKeys = _.difference(_.keys(params), _.keys(urlWithParams));
             if (queryKeys.length) {
-                urlWithParams += '?' + qs.stringify(lodash_1.default.pick(params, queryKeys));
+                urlWithParams += '?' + qs.stringify(_.pick(params, queryKeys));
             }
             var w = window;
             w.history.pushState(params, '', urlWithParams);
