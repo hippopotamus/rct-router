@@ -6,6 +6,20 @@ const qs = require('qs')
 import NotFound from './notFound'
 import EmptyTemplate from './emptyTemplate'
 
+let w: any = window
+if (w.process) { // for testing with jest
+    w = {
+        history: {
+            pushState: () => { }
+        },
+        location: {
+            href: 'http://localhost:3000/',
+        },
+        onpushstate: () => { },
+        onpopstate: () => { },
+    }
+}
+
 export type Promisable = () => Promise<any> | any
 
 export type RouteInject = { [key: string]: any }
@@ -257,16 +271,14 @@ export class Router extends React.Component<RouterProps, RouterState> {
     constructor(props: RouterProps) {
         super(props)
         this.routes = props.routes
-
-        let w: any = window
         this.state = { route: this.routeTo(new URL(w.location.href).pathname, this.routes) }
 
         w.onpopstate = () => {
             this.setState({ route: this.routeTo(new URL(w.location.href).pathname, this.routes) })
         }
 
-        w.onpushstate = () => {
-            this.setState({ route: this.routeTo(new URL(w.location.href).pathname, this.routes) })
+        w.onpushstate = (url: string) => {
+            this.setState({ route: this.routeTo(url, this.routes) })
         }
     }
 
@@ -325,9 +337,7 @@ const getRouteFromPtr = (ptrArr: Array<string>, collection: Collection | RootCol
 /* go to a view from a route */
 export const createGo = (routes: RootCollection) => {
     return (ptr: string, params: { [key: string]: any }, e?: any) => {
-        if (e) {
-            e.preventDefault()
-        }
+        _.get(e, 'preventDefault', () => { })()
 
         const route = getRouteFromPtr(ptr.split('.'), routes)
 
@@ -340,9 +350,9 @@ export const createGo = (routes: RootCollection) => {
                 urlWithParams += '?' + qs.stringify(_.pick(params, queryKeys))
             }
 
-            let w: any = window
             w.history.pushState(params, '', urlWithParams)
-            w.onpushstate(params)
+
+            w.onpushstate(urlWithParams)
         } else {
             console.log(`Route ${ptr} not found!`)
         }

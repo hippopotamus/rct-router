@@ -60,6 +60,19 @@ var path = require("path");
 var qs = require('qs');
 var notFound_1 = require("./notFound");
 var emptyTemplate_1 = require("./emptyTemplate");
+var w = window;
+if (w.process) {
+    w = {
+        history: {
+            pushState: function () { }
+        },
+        location: {
+            href: 'http://localhost:3000/',
+        },
+        onpushstate: function () { },
+        onpopstate: function () { },
+    };
+}
 var Route = /** @class */ (function () {
     function Route(props) {
         this.name = props.name;
@@ -231,13 +244,12 @@ var Router = /** @class */ (function (_super) {
     function Router(props) {
         var _this = _super.call(this, props) || this;
         _this.routes = props.routes;
-        var w = window;
         _this.state = { route: _this.routeTo(new URL(w.location.href).pathname, _this.routes) };
         w.onpopstate = function () {
             _this.setState({ route: _this.routeTo(new URL(w.location.href).pathname, _this.routes) });
         };
-        w.onpushstate = function () {
-            _this.setState({ route: _this.routeTo(new URL(w.location.href).pathname, _this.routes) });
+        w.onpushstate = function (url) {
+            _this.setState({ route: _this.routeTo(url, _this.routes) });
         };
         return _this;
     }
@@ -293,9 +305,7 @@ var getRouteFromPtr = function (ptrArr, collection) {
 /* go to a view from a route */
 exports.createGo = function (routes) {
     return function (ptr, params, e) {
-        if (e) {
-            e.preventDefault();
-        }
+        _.get(e, 'preventDefault', function () { })();
         var route = getRouteFromPtr(ptr.split('.'), routes);
         if (route) {
             var pattern = new UrlPattern(route.path);
@@ -304,9 +314,8 @@ exports.createGo = function (routes) {
             if (queryKeys.length) {
                 urlWithParams += '?' + qs.stringify(_.pick(params, queryKeys));
             }
-            var w = window;
             w.history.pushState(params, '', urlWithParams);
-            w.onpushstate(params);
+            w.onpushstate(urlWithParams);
         }
         else {
             console.log("Route " + ptr + " not found!");
