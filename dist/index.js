@@ -260,7 +260,8 @@ var Router = /** @class */ (function (_super) {
             var routePath = route.path;
             var uri = 1 < routePath.length && routePath[routePath.length - 1] === '/' ? routePath.substring(0, routePath.length - 1) : routePath;
             var pattern = new UrlPattern(uri);
-            var params = pattern.match(url);
+            var urlToMatch = url.indexOf('?') !== -1 ? url.substring(0, url.indexOf('?')) : url;
+            var params = pattern.match(urlToMatch);
             if (params) {
                 return route.addParams(params, url);
             }
@@ -310,7 +311,7 @@ exports.createGo = function (routes) {
         if (route) {
             var pattern = new UrlPattern(route.path);
             var urlWithParams = pattern.stringify(params);
-            var queryKeys = _.difference(_.keys(params), _.keys(urlWithParams));
+            var queryKeys = _.difference(_.keys(params), pattern.names);
             if (queryKeys.length) {
                 urlWithParams += '?' + qs.stringify(_.pick(params, queryKeys));
             }

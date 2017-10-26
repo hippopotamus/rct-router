@@ -289,7 +289,9 @@ export class Router extends React.Component<RouterProps, RouterState> {
             const uri = 1 < routePath.length && routePath[routePath.length - 1] === '/' ? routePath.substring(0, routePath.length - 1) : routePath
 
             const pattern = new UrlPattern(uri)
-            const params = pattern.match(url)
+
+            const urlToMatch = url.indexOf('?') !== -1 ? url.substring(0, url.indexOf('?')) : url
+            const params = pattern.match(urlToMatch)
 
             if (params) {
                 return route.addParams(params, url)
@@ -342,10 +344,10 @@ export const createGo = (routes: RootCollection) => {
         const route = getRouteFromPtr(ptr.split('.'), routes)
 
         if (route) {
-            const pattern = new UrlPattern(route.path)
+            const pattern = new UrlPattern(route.path) as any
             let urlWithParams = pattern.stringify(params)
 
-            const queryKeys = _.difference(_.keys(params), _.keys(urlWithParams))
+            const queryKeys = _.difference(_.keys(params), pattern.names)
             if (queryKeys.length) {
                 urlWithParams += '?' + qs.stringify(_.pick(params, queryKeys))
             }
