@@ -66,7 +66,7 @@ export class Route {
 
     addParams(params: RouteParams, url: string) {
         const queryStartIndex = url.indexOf('?')
-        const queryParams = queryStartIndex !== -1 ? qs.parse(url.substring(queryStartIndex, url.length)) : {}
+        const queryParams = queryStartIndex !== -1 ? qs.parse(url.substring(queryStartIndex + 1, url.length)) : {}
 
         this.params = { ...this.params, ...queryParams, ...params }
 

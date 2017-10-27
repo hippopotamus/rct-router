@@ -89,7 +89,7 @@ var Route = /** @class */ (function () {
     };
     Route.prototype.addParams = function (params, url) {
         var queryStartIndex = url.indexOf('?');
-        var queryParams = queryStartIndex !== -1 ? qs.parse(url.substring(queryStartIndex, url.length)) : {};
+        var queryParams = queryStartIndex !== -1 ? qs.parse(url.substring(queryStartIndex + 1, url.length)) : {};
         this.params = __assign({}, this.params, queryParams, params);
         return this;
     };
