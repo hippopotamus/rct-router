@@ -55,13 +55,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var UrlPattern = require("url-pattern");
-var _ = require("lodash");
 var path = require("path");
 var qs = require('qs');
 var notFound_1 = require("./notFound");
 var emptyTemplate_1 = require("./emptyTemplate");
 var w = window;
-if (w.process) {
+if (w.process) { // for testing with jest
     w = {
         history: {
             pushState: function () { }
@@ -192,7 +191,7 @@ var TemplateBuilder = /** @class */ (function (_super) {
         }
         else if (0 < templates.length) {
             return (React.createElement(Template, { route: this.props.route },
-                React.createElement(TemplateBuilder, { templates: _.tail(templates), route: this.props.route }, this.props.children)));
+                React.createElement(TemplateBuilder, { templates: templates.slice(1, templates.length), route: this.props.route }, this.props.children)));
         }
         else {
             return React.createElement(Template, { route: this.props.route }, this.props.children);
@@ -284,7 +283,7 @@ var Router = /** @class */ (function (_super) {
 exports.Router = Router;
 var getRouteFromPtr = function (ptrArr, collection) {
     var ptr = ptrArr[0];
-    var tail = _.tail(ptrArr);
+    var tail = ptrArr.slice(1, ptrArr.length);
     if (tail.length) {
         for (var _i = 0, _a = collection.collections; _i < _a.length; _i++) {
             var subCollection = _a[_i];
@@ -304,16 +303,33 @@ var getRouteFromPtr = function (ptrArr, collection) {
     return false;
 };
 /* go to a view from a route */
-exports.createGo = function (routes) {
+function createGo(routes) {
     return function (ptr, params, e) {
-        _.get(e, 'preventDefault', function () { })();
+        if (e && e.preventDefault) {
+            e.preventDefault();
+        }
         var route = getRouteFromPtr(ptr.split('.'), routes);
         if (route) {
             var pattern = new UrlPattern(route.path);
             var urlWithParams = pattern.stringify(params);
-            var queryKeys = _.difference(_.keys(params), pattern.names);
+            var paramKeys = Object.keys(params);
+            var queryKeys = [];
+            for (var _i = 0, paramKeys_1 = paramKeys; _i < paramKeys_1.length; _i++) {
+                var key = paramKeys_1[_i];
+                if (pattern.names.indexOf(key) === -1) {
+                    queryKeys.push(key);
+                }
+            }
             if (queryKeys.length) {
-                urlWithParams += '?' + qs.stringify(_.pick(params, queryKeys));
+                var queryParams = {};
+                for (var _a = 0, paramKeys_2 = paramKeys; _a < paramKeys_2.length; _a++) {
+                    var key = paramKeys_2[_a];
+                    var val = params[key];
+                    if (queryKeys.indexOf(val) !== -1) {
+                        queryParams[key] = val;
+                    }
+                }
+                urlWithParams += '?' + qs.stringify(queryParams);
             }
             w.history.pushState(params, '', urlWithParams);
             w.onpushstate(urlWithParams);
@@ -322,4 +338,5 @@ exports.createGo = function (routes) {
             console.log("Route " + ptr + " not found!");
         }
     };
-};
+}
+exports.createGo = createGo;

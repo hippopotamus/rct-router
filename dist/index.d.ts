@@ -97,6 +97,9 @@ export declare class Router extends React.Component<RouterProps, RouterState> {
     routeTo(url: string, collection: Collection | RootCollection): Route;
     render(): JSX.Element;
 }
-export declare const createGo: (routes: RootCollection) => (ptr: string, params: {
-    [key: string]: any;
-}, e?: any) => void;
+export interface Go<E extends string> {
+    (ptr: E, params: {
+        [key: string]: any;
+    }, e?: any): void;
+}
+export declare function createGo<E extends string>(routes: RootCollection): Go<E>;

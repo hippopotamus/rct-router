@@ -1,6 +1,5 @@
 import * as React from 'react'
 import * as UrlPattern from 'url-pattern'
-import * as _ from 'lodash'
 import * as path from 'path'
 const qs = require('qs')
 import NotFound from './notFound'
@@ -217,7 +216,7 @@ class TemplateBuilder extends React.Component<TemplateBuilderProps> {
         } else if (0 < templates.length) {
             return (
                 <Template route={this.props.route}>
-                    <TemplateBuilder templates={_.tail(templates)} route={this.props.route}>
+                    <TemplateBuilder templates={templates.slice(1, templates.length)} route={this.props.route}>
                         {this.props.children}
                     </TemplateBuilder>
                 </Template>
@@ -317,7 +316,7 @@ export class Router extends React.Component<RouterProps, RouterState> {
 
 const getRouteFromPtr = (ptrArr: Array<string>, collection: Collection | RootCollection): Route | false => {
     const ptr = ptrArr[0]
-    const tail = _.tail(ptrArr)
+    const tail = ptrArr.slice(1, ptrArr.length)
 
     if (tail.length) {
         for (const subCollection of collection.collections) {
@@ -336,10 +335,16 @@ const getRouteFromPtr = (ptrArr: Array<string>, collection: Collection | RootCol
     return false
 }
 
+export interface Go<E extends string> {
+    (ptr: E, params: { [key: string]: any }, e?: any): void
+}
+
 /* go to a view from a route */
-export const createGo = (routes: RootCollection) => {
-    return (ptr: string, params: { [key: string]: any }, e?: any) => {
-        _.get(e, 'preventDefault', () => { })()
+export function createGo<E extends string>(routes: RootCollection): Go<E> {
+    return (ptr: E, params: { [key: string]: any }, e?: any) => {
+        if (e && e.preventDefault) {
+            e.preventDefault()
+        }
 
         const route = getRouteFromPtr(ptr.split('.'), routes)
 
@@ -347,9 +352,27 @@ export const createGo = (routes: RootCollection) => {
             const pattern = new UrlPattern(route.path) as any
             let urlWithParams = pattern.stringify(params)
 
-            const queryKeys = _.difference(_.keys(params), pattern.names)
+            const paramKeys = Object.keys(params)
+
+            let queryKeys: string[] = []
+
+            for (const key of paramKeys) {
+                if (pattern.names.indexOf(key) === -1) {
+                    queryKeys.push(key)
+                }
+            }
+
             if (queryKeys.length) {
-                urlWithParams += '?' + qs.stringify(_.pick(params, queryKeys))
+                let queryParams = {} as any
+
+                for (const key of paramKeys) {
+                    const val = params[key]
+                    if (queryKeys.indexOf(val) !== -1) {
+                        queryParams[key] = val
+                    }
+                }
+
+                urlWithParams += '?' + qs.stringify(queryParams)
             }
 
             w.history.pushState(params, '', urlWithParams)
