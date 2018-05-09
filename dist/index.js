@@ -238,14 +238,19 @@ var RouteRenderer = /** @class */ (function (_super) {
     };
     return RouteRenderer;
 }(React.Component));
+var buildUrl = function (href) {
+    var url = new URL(href);
+    var search = url.search || '';
+    return url.pathname + search;
+};
 var Router = /** @class */ (function (_super) {
     __extends(Router, _super);
     function Router(props) {
         var _this = _super.call(this, props) || this;
         _this.routes = props.routes;
-        _this.state = { route: _this.routeTo(new URL(w.location.href).pathname, _this.routes) };
+        _this.state = { route: _this.routeTo(buildUrl(w.location.href), _this.routes) };
         w.onpopstate = function () {
-            _this.setState({ route: _this.routeTo(new URL(w.location.href).pathname, _this.routes) });
+            _this.setState({ route: _this.routeTo(buildUrl(w.location.href), _this.routes) });
         };
         w.onpushstate = function (url) {
             _this.setState({ route: _this.routeTo(url, _this.routes) });
@@ -314,20 +319,18 @@ function createGo(routes) {
             var urlWithParams = pattern.stringify(params);
             var paramKeys = Object.keys(params);
             var queryKeys = [];
-            for (var _i = 0, paramKeys_1 = paramKeys; _i < paramKeys_1.length; _i++) {
-                var key = paramKeys_1[_i];
-                if (pattern.names.indexOf(key) === -1) {
+            var routeKeys = Object.keys(route.params);
+            for (var i = 0; i < routeKeys.length; i++) {
+                var key = routeKeys[i];
+                if (paramKeys.indexOf(key) === -1) {
                     queryKeys.push(key);
                 }
             }
             if (queryKeys.length) {
                 var queryParams = {};
-                for (var _a = 0, paramKeys_2 = paramKeys; _a < paramKeys_2.length; _a++) {
-                    var key = paramKeys_2[_a];
-                    var val = params[key];
-                    if (queryKeys.indexOf(val) !== -1) {
-                        queryParams[key] = val;
-                    }
+                for (var _i = 0, queryKeys_1 = queryKeys; _i < queryKeys_1.length; _i++) {
+                    var key = queryKeys_1[_i];
+                    queryParams[key] = route.params[key];
                 }
                 urlWithParams += '?' + qs.stringify(queryParams);
             }

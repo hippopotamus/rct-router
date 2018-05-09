@@ -264,16 +264,22 @@ class RouteRenderer extends React.Component<RouteRendererProps, RouteRendererSta
     }
 }
 
+const buildUrl = (href: string) => {
+    const url = new URL(href)
+    const search = url.search || ''
+    return url.pathname + search
+}
+
 export class Router extends React.Component<RouterProps, RouterState> {
     routes: RootCollection
 
     constructor(props: RouterProps) {
         super(props)
         this.routes = props.routes
-        this.state = { route: this.routeTo(new URL(w.location.href).pathname, this.routes) }
+        this.state = { route: this.routeTo(buildUrl(w.location.href), this.routes) }
 
         w.onpopstate = () => {
-            this.setState({ route: this.routeTo(new URL(w.location.href).pathname, this.routes) })
+            this.setState({ route: this.routeTo(buildUrl(w.location.href), this.routes) })
         }
 
         w.onpushstate = (url: string) => {
@@ -283,6 +289,7 @@ export class Router extends React.Component<RouterProps, RouterState> {
 
     routeTo(url: string, collection: Collection | RootCollection): Route {
         url = 1 < url.length && url[url.length - 1] === '/' ? url.substring(0, url.length - 1) : url
+
         for (const route of collection.routes) {
             const routePath = route.path
             const uri = 1 < routePath.length && routePath[routePath.length - 1] === '/' ? routePath.substring(0, routePath.length - 1) : routePath
@@ -355,9 +362,12 @@ export function createGo<E extends string>(routes: RootCollection): Go<E> {
             const paramKeys = Object.keys(params)
 
             let queryKeys: string[] = []
+            const routeKeys = Object.keys(route.params)
 
-            for (const key of paramKeys) {
-                if (pattern.names.indexOf(key) === -1) {
+            for (let i = 0; i < routeKeys.length; i++) {
+                const key = routeKeys[i]
+
+                if (paramKeys.indexOf(key) === -1) {
                     queryKeys.push(key)
                 }
             }
@@ -365,11 +375,8 @@ export function createGo<E extends string>(routes: RootCollection): Go<E> {
             if (queryKeys.length) {
                 let queryParams = {} as any
 
-                for (const key of paramKeys) {
-                    const val = params[key]
-                    if (queryKeys.indexOf(val) !== -1) {
-                        queryParams[key] = val
-                    }
+                for (const key of queryKeys) {
+                    queryParams[key] = route.params[key]
                 }
 
                 urlWithParams += '?' + qs.stringify(queryParams)
