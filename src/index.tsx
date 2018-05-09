@@ -359,15 +359,15 @@ export function createGo<E extends string>(routes: RootCollection): Go<E> {
             const pattern = new UrlPattern(route.path) as any
             let urlWithParams = pattern.stringify(params)
 
-            const paramKeys = Object.keys(params)
+            const routeParams = route.params || {}
+            const allParams = { ...params, ...routeParams }
+            const allKeys = Object.keys(allParams)
 
             let queryKeys: string[] = []
-            const routeKeys = Object.keys(route.params)
+            for (let i = 0; i < allKeys.length; i++) {
+                const key = allKeys[i]
 
-            for (let i = 0; i < routeKeys.length; i++) {
-                const key = routeKeys[i]
-
-                if (paramKeys.indexOf(key) === -1) {
+                if (pattern.names.indexOf(key) === -1) {
                     queryKeys.push(key)
                 }
             }
@@ -376,7 +376,7 @@ export function createGo<E extends string>(routes: RootCollection): Go<E> {
                 let queryParams = {} as any
 
                 for (const key of queryKeys) {
-                    queryParams[key] = route.params[key]
+                    queryParams[key] = allParams[key]
                 }
 
                 urlWithParams += '?' + qs.stringify(queryParams)

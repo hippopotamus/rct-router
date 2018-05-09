@@ -317,12 +317,13 @@ function createGo(routes) {
         if (route) {
             var pattern = new UrlPattern(route.path);
             var urlWithParams = pattern.stringify(params);
-            var paramKeys = Object.keys(params);
+            var routeParams = route.params || {};
+            var allParams = __assign({}, params, routeParams);
+            var allKeys = Object.keys(allParams);
             var queryKeys = [];
-            var routeKeys = Object.keys(route.params);
-            for (var i = 0; i < routeKeys.length; i++) {
-                var key = routeKeys[i];
-                if (paramKeys.indexOf(key) === -1) {
+            for (var i = 0; i < allKeys.length; i++) {
+                var key = allKeys[i];
+                if (pattern.names.indexOf(key) === -1) {
                     queryKeys.push(key);
                 }
             }
@@ -330,7 +331,7 @@ function createGo(routes) {
                 var queryParams = {};
                 for (var _i = 0, queryKeys_1 = queryKeys; _i < queryKeys_1.length; _i++) {
                     var key = queryKeys_1[_i];
-                    queryParams[key] = route.params[key];
+                    queryParams[key] = allParams[key];
                 }
                 urlWithParams += '?' + qs.stringify(queryParams);
             }
