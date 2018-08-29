@@ -108,18 +108,12 @@ go(
 
 // How I use it
 /** routes.ts */
-interface RouteNames {
-    home: string,
-    login: string,
-    dashboard: string,
-    profile: string,
-}
 
-export const route: RouteNames = {
-    home: 'home',
-    login: 'login',
-    dashboard: 'dashboard.home',
-    profile: 'dashboard.profile.home'
+export enum route {
+    home = 'home',
+    login = 'login',
+    dashboard = 'dashboard.home',
+    profile = 'dashboard.profile.home',
 }
 
 export const go = createGo(router)
