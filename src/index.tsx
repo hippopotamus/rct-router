@@ -27,7 +27,7 @@ export interface RouteProps {
     path: string
     component: React.ComponentType<any>
     template?: React.ComponentType<any>
-    beforeRender?: Promisable
+    beforeRender?: Array<(route: InjectedRoute) => Promise<any | void>>
     inject?: RouteInject
 }
 
@@ -43,7 +43,7 @@ export class Route {
     path: string
     Component: React.ComponentType<any>
     templates: Array<React.ComponentType<any>>
-    beforeRender: Promisable
+    beforeRender: Array<(route: InjectedRoute) => Promise<any | void>>
     params: RouteParams
     inject: RouteInject
     urn: string
@@ -53,9 +53,13 @@ export class Route {
         this.path = props.path
         this.Component = props.component
         this.templates = [props.template || EmptyTemplate]
-        this.beforeRender = props.beforeRender || function () { }
+        this.beforeRender = props.beforeRender || [async function () { }]
         this.inject = props.inject || {}
         this.urn = this.name
+    }
+
+    replaceInject(inject: RouteInject) {
+        this.inject = inject
     }
 
     addTemplate(template: React.ComponentType<any>) {
@@ -238,19 +242,26 @@ export interface RouteRendererState {
 class RouteRenderer extends React.Component<RouteRendererProps, RouteRendererState> {
     state: RouteRendererState = { route: null }
 
-    async beforeRender(props: RouteRendererProps) {
-        await props.route.beforeRender()
+    async beforeRender(route: Route) {
+        for (const fn of route.beforeRender) {
+            const inject = await fn(route)
+            if (inject) {
+                route.replaceInject(inject)
+            }
+        }
+
+        return route
     }
 
     async componentWillMount() {
-        await this.beforeRender(this.props)
-        this.setState({ route: this.props.route })
+        const route = await this.beforeRender(this.props.route)
+        this.setState({ route })
     }
 
     async componentWillReceiveProps(newProps: RouteRendererProps) {
         if (newProps.route.path !== this.props.route.path) {
-            await this.beforeRender(newProps)
-            this.setState({ route: newProps.route })
+            const route = await this.beforeRender(newProps.route)
+            this.setState({ route })
         }
     }
 
