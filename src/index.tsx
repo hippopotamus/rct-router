@@ -1,7 +1,8 @@
 import * as React from 'react'
 import * as UrlPattern from 'url-pattern'
 import * as path from 'path'
-const qs = require('qs')
+import * as qs from 'qs'
+import ErrorView from './ErrorView'
 import NotFound from './notFound'
 import EmptyTemplate from './emptyTemplate'
 
@@ -94,18 +95,20 @@ export class Route {
 }
 
 export interface RootCollectionProps {
-    path?: string,
-    notFound?: React.ComponentType<any>,
-    template?: React.ComponentType<any>,
+    error?: React.ComponentType<any>
+    notFound?: React.ComponentType<any>
+    path?: string
+    template?: React.ComponentType<any>
 }
 
 export class RootCollection {
-    name: string
-    path: string
-    templates: Array<React.ComponentType<any>>
-    routes: Array<Route>
     collections: Array<Collection>
+    error: React.ComponentType<any>
+    name: string
     notFound: React.ComponentType<any>
+    path: string
+    routes: Array<Route>
+    templates: Array<React.ComponentType<any>>
     urn: string
 
     constructor(props: RootCollectionProps) {
@@ -115,6 +118,7 @@ export class RootCollection {
         this.templates = [props.template || EmptyTemplate]
         this.routes = []
         this.collections = []
+        this.error = props.error || ErrorView
         this.notFound = props.notFound || NotFound
     }
 
@@ -201,13 +205,13 @@ export interface RouterProps { routes: RootCollection }
 export interface RouterState { route: Route }
 
 export interface TemplateProps {
-    route: InjectedRoute,
+    route: InjectedRoute
 }
 
 export interface TemplateBuilderProps {
-    route: InjectedRoute,
-    templates: Array<React.ComponentType<TemplateProps>>,
-    children: React.ReactElement<any>,
+    route: InjectedRoute
+    templates: Array<React.ComponentType<TemplateProps>>
+    children: React.ReactElement<any>
 }
 
 class TemplateBuilder extends React.Component<TemplateBuilderProps> {
@@ -233,6 +237,7 @@ class TemplateBuilder extends React.Component<TemplateBuilderProps> {
 
 export interface RouteRendererProps {
     route: Route
+    errorView: React.ComponentType<any>
 }
 
 export interface RouteRendererState {
@@ -266,13 +271,21 @@ class RouteRenderer extends React.Component<RouteRendererProps, RouteRendererSta
     }
 
     render() {
+        const ErrorView = this.props.errorView
+
         const route = this.state.route
         if (!route) {
             return null
         }
 
         const ComponentToRender = route.Component
-        return <TemplateBuilder templates={route.templates} route={route.formatForInject()}><ComponentToRender route={route.formatForInject()} /></TemplateBuilder>
+        return (
+            <ErrorView>
+                <TemplateBuilder templates={route.templates} route={route.formatForInject()}>
+                    <ComponentToRender route={route.formatForInject()} />
+                </TemplateBuilder>
+            </ErrorView>
+        )
     }
 }
 
@@ -329,7 +342,7 @@ export class Router extends React.Component<RouterProps, RouterState> {
     }
 
     render() {
-        return <RouteRenderer route={this.state.route} />
+        return <RouteRenderer errorView={this.routes.error} route={this.state.route} />
     }
 }
 

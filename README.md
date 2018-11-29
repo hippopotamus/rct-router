@@ -8,9 +8,10 @@ NOTE: This won't work with browsers that don't support the HTML5 History API
 import { Collection, createGo, RootCollection, Route } from 'rct-router'
 
 const router = new RootCollection({
+    error: Views.Error,
+    notFound: Views.NotFound,
     path: '/',
     template: Templates.Root,
-    notFound: Views.NotFound,
 }).addRoute(new Route({
     name: 'home',
     path: '/',
@@ -66,11 +67,14 @@ ReactDOM.render(
 
 ### How to use
 Start with RootCollection, which takes the parameters "template", "notFound", and "path"... notFound is the optional component to render when a route isn't found
+error is an optional component which should follow the [react 16 error handler pattern](https://reactjs.org/blog/2017/07/26/error-handling-in-react-16.html).
+there is a default ugly one provided in this package.
 ```js
 new RootCollection({
     path?: '/' or whatever you want the root to be,
     template?: Component with props.children,
     notFound?: Component,
+    error?: Component
 })
 ```
 use `addCollection` to add a collection of routes with the params. this method also exists on collections
