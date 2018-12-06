@@ -39,7 +39,7 @@ export interface InjectedRoute {
     inject: RouteInject
 }
 
-export class Route {
+export class RctRoute {
     name: string
     path: string
     Component: React.ComponentType<any>
@@ -107,7 +107,7 @@ export class RootCollection {
     name: string
     notFound: React.ComponentType<any>
     path: string
-    routes: Array<Route>
+    routes: Array<RctRoute>
     templates: Array<React.ComponentType<any>>
     urn: string
 
@@ -122,7 +122,7 @@ export class RootCollection {
         this.notFound = props.notFound || NotFound
     }
 
-    addRoute(route: Route) {
+    addRoute(route: RctRoute) {
         this.routes.push(route)
         return this
     }
@@ -156,7 +156,7 @@ export class Collection {
     urn: string
     path: string
     templates: Array<React.ComponentType<any>>
-    routes: Array<Route>
+    routes: Array<RctRoute>
     collections: Array<Collection>
 
     constructor(props: CollectionProps) {
@@ -168,7 +168,7 @@ export class Collection {
         this.collections = []
     }
 
-    addRoute(route: Route) {
+    addRoute(route: RctRoute) {
         this.routes.push(route)
         return this
     }
@@ -202,7 +202,7 @@ export class Collection {
 
 
 export interface RouterProps { routes: RootCollection }
-export interface RouterState { route: Route }
+export interface RouterState { route: RctRoute }
 
 export interface TemplateProps {
     route: InjectedRoute
@@ -236,18 +236,18 @@ class TemplateBuilder extends React.Component<TemplateBuilderProps> {
 }
 
 export interface RouteRendererProps {
-    route: Route
+    route: RctRoute
     errorView: React.ComponentType<any>
 }
 
 export interface RouteRendererState {
-    route: Route | null
+    route: RctRoute | null
 }
 
 class RouteRenderer extends React.Component<RouteRendererProps, RouteRendererState> {
     state: RouteRendererState = { route: null }
 
-    async beforeRender(route: Route) {
+    async beforeRender(route: RctRoute) {
         for (const fn of route.beforeRender) {
             const inject = await fn(route)
             if (inject) {
@@ -312,7 +312,7 @@ export class Router extends React.Component<RouterProps, RouterState> {
         }
     }
 
-    routeTo(url: string, collection: Collection | RootCollection): Route {
+    routeTo(url: string, collection: Collection | RootCollection): RctRoute {
         url = 1 < url.length && url[url.length - 1] === '/' ? url.substring(0, url.length - 1) : url
 
         for (const route of collection.routes) {
@@ -338,7 +338,7 @@ export class Router extends React.Component<RouterProps, RouterState> {
             }
         }
 
-        return new Route({ name: 'notFound', path: '/not-found', component: this.routes.notFound })
+        return new RctRoute({ name: 'notFound', path: '/not-found', component: this.routes.notFound })
     }
 
     render() {
@@ -346,7 +346,7 @@ export class Router extends React.Component<RouterProps, RouterState> {
     }
 }
 
-const getRouteFromPtr = (ptrArr: Array<string>, collection: Collection | RootCollection): Route | false => {
+const getRouteFromPtr = (ptrArr: Array<string>, collection: Collection | RootCollection): RctRoute | false => {
     const ptr = ptrArr[0]
     const tail = ptrArr.slice(1, ptrArr.length)
 
