@@ -5,18 +5,18 @@ NOTE: This won't work with browsers that don't support the HTML5 History API
 ### An example
 ```js
 /** routes.js */
-import { Collection, createGo, RootCollection, Route } from 'rct-router'
+import { Collection, createGo, RootCollection, RctRoute } from 'rct-router'
 
 const router = new RootCollection({
     error: Views.Error,
     notFound: Views.NotFound,
     path: '/',
     template: Templates.Root,
-}).addRoute(new Route({
+}).addRoute(new RctRoute({
     name: 'home',
     path: '/',
     component: Views.Login,
-})).addRoute(new Route({
+})).addRoute(new RctRoute({
     name: 'login',
     path: '/login',
     component: Views.Login,
@@ -25,7 +25,7 @@ const router = new RootCollection({
         name: 'dashboard',
         path: '/dashboard',
         template: Templates.Dashboard,
-    }).addRoute(new Route({
+    }).addRoute(new RctRoute({
         name: 'home',
         path: '/',
         component: Views.Dashboard.Home,
@@ -39,7 +39,7 @@ const router = new RootCollection({
         new Collection({
             name: 'profile',
             path: '/profile',
-        }).addRoute(new Route({
+        }).addRoute(new RctRoute({
             name: 'home',
             path: '/',
             component: Views.Dashboard.Profile.Home,
@@ -53,7 +53,7 @@ const router = new RootCollection({
         })))).build()
 
 export const routes = router
-export const go = createGo(router)
+export const go = createGo<Route>(router)
 
 /** app.js */
 import { Router } from 'rct-router'
@@ -87,7 +87,7 @@ new Collection({
 ```
 the `addRoute` method on both RootCollection and Collection takes the parameters
 ```js
-new Route({
+new RctRoute({
     name: string
     path: string
     component: React.ComponentType<any>
@@ -113,22 +113,22 @@ go(
 // How I use it
 /** routes.ts */
 
-export enum route {
-    home = 'home',
-    login = 'login',
-    dashboard = 'dashboard.home',
-    profile = 'dashboard.profile.home',
+export enum Route {
+    Home = 'home',
+    Login = 'login',
+    Dashboard = 'dashboard.home',
+    Profile = 'dashboard.profile.home',
 }
 
 export const go = createGo(router)
 
 /** dashboard/home.tsx */
-import { route, go } from '../../routes'
+import { Route, go } from '../../routes'
 
 class Dashboard extends Component<Props, State> {
     /** ... */
     onClick = (e) => {
-        go(route.profile, { personId: this.props.person.id }, e)
+        go(Route.Profile, { personId: this.props.person.id }, e)
     }
     /** ... */
 }
