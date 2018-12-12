@@ -1,3 +1,7 @@
 import * as React from 'react'
 
-export default () => <div>Route not found</div>
+export default class NotFound extends React.Component {
+    render() {
+        return <div>Route not found</div>
+    }
+}

@@ -1,6 +1,6 @@
 {
   "name": "rct-router",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "a router for react",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,10 +25,10 @@
   },
   "homepage": "https://github.com/hippopotamus2/rct-router#readme",
   "devDependencies": {
-    "@types/node": "^10.12.10",
+    "@types/node": "^10.12.12",
     "@types/qs": "^6.5.1",
-    "@types/react": "^16.7.8",
-    "typescript": "^3.1.6"
+    "@types/react": "^16.7.13",
+    "typescript": "^3.2.2"
   },
   "dependencies": {
     "qs": "^6.6.0",

@@ -1,7 +1,7 @@
 import * as React from 'react'
 
-export type EmptyTemplateProps = {
-    children: React.ReactElement<any>
+export default class EmptyTemplate extends React.Component {
+    render() {
+        return this.props.children
+    }
 }
-
-export default (props: EmptyTemplateProps) => props.children
