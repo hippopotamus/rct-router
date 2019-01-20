@@ -379,13 +379,12 @@ export function createGo<E extends string>(routes: RootCollection): Go<E> {
         }
 
         const route = getRouteFromPtr(ptr.split('.'), routes)
-
         if (route) {
             const pattern = new UrlPattern(route.path) as any
             let urlWithParams = pattern.stringify(params)
 
             const routeParams = route.params || {}
-            const allParams = { ...params, ...routeParams }
+            const allParams = { ...routeParams, ...params }
             const allKeys = Object.keys(allParams)
 
             let queryKeys: string[] = []

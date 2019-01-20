@@ -1,6 +1,6 @@
 {
   "name": "rct-router",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "a router for react",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
