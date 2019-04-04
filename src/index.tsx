@@ -319,7 +319,7 @@ export class Router extends React.Component<RouterProps, RouterState> {
             const routePath = route.path
             const uri = 1 < routePath.length && routePath[routePath.length - 1] === '/' ? routePath.substring(0, routePath.length - 1) : routePath
 
-            const pattern = new UrlPattern(uri)
+            const pattern = new UrlPattern(uri + '(/)')
 
             const urlToMatch = url.indexOf('?') !== -1 ? url.substring(0, url.indexOf('?')) : url
             const params = pattern.match(urlToMatch)
