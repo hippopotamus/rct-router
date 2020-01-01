@@ -72,7 +72,7 @@ export class RctRoute {
         const queryStartIndex = url.indexOf('?')
         const queryParams = queryStartIndex !== -1 ? qs.parse(url.substring(queryStartIndex + 1, url.length)) : {}
 
-        this.params = { ...this.params, ...queryParams, ...params }
+        this.params = { ...queryParams, ...params }
 
         return this
     }
