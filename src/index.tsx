@@ -26,8 +26,8 @@ export type RouteInject = { [key: string]: any }
 export interface RouteProps {
     name: string
     path: string
-    component: React.ComponentClass<any>
-    template?: React.ComponentClass<any>
+    component: any
+    template?: any
     beforeRender?: Array<(route: InjectedRoute) => Promise<any | void>>
     inject?: RouteInject
 }
@@ -42,8 +42,8 @@ export interface InjectedRoute {
 export class RctRoute {
     name: string
     path: string
-    Component: React.ComponentClass<any>
-    templates: Array<React.ComponentClass<any>>
+    Component: any
+    templates: Array<any>
     beforeRender: Array<(route: InjectedRoute) => Promise<any | void>>
     params: RouteParams
     inject: RouteInject
@@ -63,7 +63,7 @@ export class RctRoute {
         this.inject = inject
     }
 
-    addTemplate(template: React.ComponentClass<any>) {
+    addTemplate(template: any) {
         this.templates.push(template)
         return this
     }
@@ -95,20 +95,20 @@ export class RctRoute {
 }
 
 export interface RootCollectionProps {
-    error?: React.ComponentClass<any>
-    notFound?: React.ComponentClass<any>
+    error?: any
+    notFound?: any
     path?: string
-    template?: React.ComponentClass<any>
+    template?: any
 }
 
 export class RootCollection {
     collections: Array<Collection>
-    error: React.ComponentClass<any>
+    error: any
     name: string
-    notFound: React.ComponentClass<any>
+    notFound: any
     path: string
     routes: Array<RctRoute>
-    templates: Array<React.ComponentClass<any>>
+    templates: Array<any>
     urn: string
 
     constructor(props: RootCollectionProps) {
@@ -148,14 +148,14 @@ export class RootCollection {
 export interface CollectionProps {
     name: string,
     path: string,
-    template?: React.ComponentClass<any>
+    template?: any
 }
 
 export class Collection {
     name: string
     urn: string
     path: string
-    templates: Array<React.ComponentClass<any>>
+    templates: Array<any>
     routes: Array<RctRoute>
     collections: Array<Collection>
 
@@ -178,7 +178,7 @@ export class Collection {
         return this
     }
 
-    addTemplate(template: React.ComponentClass<any>) {
+    addTemplate(template: any) {
         this.templates.push(template)
         return this
     }
@@ -237,7 +237,7 @@ class TemplateBuilder extends React.Component<TemplateBuilderProps> {
 
 export interface RouteRendererProps {
     route: RctRoute
-    errorView: React.ComponentClass<any>
+    errorView: any
 }
 
 export interface RouteRendererState {
@@ -258,14 +258,14 @@ class RouteRenderer extends React.Component<RouteRendererProps, RouteRendererSta
         return route
     }
 
-    async componentWillMount() {
+    async componentDidMount() {
         const route = await this.beforeRender(this.props.route)
         this.setState({ route })
     }
 
-    async componentWillReceiveProps(newProps: RouteRendererProps) {
-        if (newProps.route.path !== this.props.route.path) {
-            const route = await this.beforeRender(newProps.route)
+    async componentDidUpdate(prevProps: RouteRendererProps) {
+        if (prevProps.route.path !== this.props.route.path) {
+            const route = await this.beforeRender(this.props.route)
             this.setState({ route })
         }
     }
