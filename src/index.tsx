@@ -68,10 +68,13 @@ export class RctRoute {
         return this
     }
 
-    addParams(params: RouteParams, url: string) {
+    addParams(p: RouteParams, url: string) {
         const queryStartIndex = url.indexOf('?')
         const queryParams = queryStartIndex !== -1 ? qs.parse(url.substring(queryStartIndex + 1, url.length)) : {}
-
+        let params: any = {}
+        for (const key of Object.keys(p)) {
+            params[key] = decodeURI(p[key])
+        }
         this.params = { ...queryParams, ...params }
 
         return this
