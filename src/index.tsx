@@ -262,14 +262,18 @@ class RouteRenderer extends React.Component<RouteRendererProps, RouteRendererSta
     }
 
     async componentDidMount() {
-        const route = await this.beforeRender(this.props.route)
-        this.setState({ route })
+        try {
+            const route = await this.beforeRender(this.props.route)
+            this.setState({ route })
+        } catch { }
     }
 
     async componentDidUpdate(prevProps: RouteRendererProps) {
         if (prevProps.route.path !== this.props.route.path) {
-            const route = await this.beforeRender(this.props.route)
-            this.setState({ route })
+            try {
+                const route = await this.beforeRender(this.props.route)
+                this.setState({ route })
+            } catch { }
         }
     }
 
