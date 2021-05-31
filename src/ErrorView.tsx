@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export default class ErrorView extends React.Component {
+export class ErrorView extends React.Component {
     state = { hasError: false }
 
     componentDidCatch() {

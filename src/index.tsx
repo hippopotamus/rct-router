@@ -2,9 +2,9 @@ import * as React from 'react'
 import * as UrlPattern from 'url-pattern'
 import * as path from 'path'
 import * as qs from 'qs'
-import ErrorView from './ErrorView'
-import NotFound from './notFound'
-import EmptyTemplate from './emptyTemplate'
+import { ErrorView } from './ErrorView'
+import { NotFound } from './NotFound'
+import { EmptyTemplate } from './EmptyTemplate'
 
 let w: any = window
 if (w.process) { // for testing with jest
