@@ -379,7 +379,7 @@ export interface Go<E extends string> {
 }
 
 /* go to a view from a route */
-export function createGo<E extends string>(routes: RootCollection): Go<E> {
+export function createGo<E extends string>(routes: RootCollection, defaultParams: () => any): Go<E> {
     return (ptr: E, params: { [key: string]: any }, e?: any) => {
         if (e && e.preventDefault) {
             e.preventDefault()
@@ -388,6 +388,7 @@ export function createGo<E extends string>(routes: RootCollection): Go<E> {
         const route = getRouteFromPtr(ptr.split('.'), routes)
         if (route) {
             route.params = {}
+            params = { ...defaultParams(), ...params }
             const pattern = new UrlPattern(route.path) as any
             let urlWithParams = pattern.stringify(params)
 
@@ -404,7 +405,6 @@ export function createGo<E extends string>(routes: RootCollection): Go<E> {
 
             if (queryKeys.length) {
                 let queryParams = {} as any
-
                 for (const key of queryKeys) {
                     queryParams[key] = params[key]
                 }
