@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export class ErrorView extends React.Component {
+export class ErrorView extends React.Component<React.PropsWithChildren<{}>> {
     state = { hasError: false }
 
     componentDidCatch() {

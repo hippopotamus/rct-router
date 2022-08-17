@@ -208,34 +208,33 @@ export interface RouterProps { routes: RootCollection }
 export interface RouterState { route: RctRoute }
 
 export interface TemplateProps {
+    children: React.ReactElement<any>
     route: InjectedRoute
 }
 
 export interface TemplateBuilderProps {
+    children: React.ReactElement<any>
     route: InjectedRoute
     templates: Array<React.ComponentClass<TemplateProps>>
-    children: React.ReactElement<any>
 }
 
-class TemplateBuilder extends React.Component<TemplateBuilderProps> {
-    render() {
-        let templates = this.props.templates
+const TemplateBuilder = (props:TemplateBuilderProps)  =>{
+        let templates = props.templates
         const Template = templates[0]
 
         if (!Template) {
-            return this.props.children
+            return props.children
         } else if (0 < templates.length) {
             return (
-                <Template route={this.props.route}>
-                    <TemplateBuilder templates={templates.slice(1, templates.length)} route={this.props.route}>
-                        {this.props.children}
+                <Template route={props.route}>
+                    <TemplateBuilder templates={templates.slice(1, templates.length)} route={props.route}>
+                        {props.children}
                     </TemplateBuilder>
                 </Template>
             )
         } else {
-            return <Template route={this.props.route}>{this.props.children}</Template>
+            return <Template route={props.route}>{props.children}</Template>
         }
-    }
 }
 
 export interface RouteRendererProps {
