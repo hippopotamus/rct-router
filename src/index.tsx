@@ -13,7 +13,7 @@ if (w.process) { // for testing with jest
             pushState: () => { }
         },
         location: {
-            href: 'http://localhost:3000/',
+            href: window.location.href || 'http://localhost:3000/',
         },
         onpushstate: () => { },
         onpopstate: () => { },
