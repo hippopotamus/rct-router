@@ -7,18 +7,6 @@ import { NotFound } from './NotFound'
 import { EmptyTemplate } from './EmptyTemplate'
 
 let w: any = window
-if (w.process) { // for testing with jest
-    w = {
-        history: {
-            pushState: () => { }
-        },
-        location: {
-            href: window.location.href || 'http://localhost:3000/',
-        },
-        onpushstate: () => { },
-        onpopstate: () => { },
-    }
-}
 
 export type Promisable = () => Promise<any> | any
 
