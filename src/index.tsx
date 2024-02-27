@@ -408,7 +408,10 @@ export function createGo<E extends string>(routes: RootCollection, defaultParams
     }
 }
 
-export function createGetUri<E extends string>(routes: RootCollection, defaultParams: () => any): Go<E> {
+export interface GetUri<E extends string> {
+    (ptr: E, params: { [key: string]: any }, e?: any): string
+}
+export function createGetUri<E extends string>(routes: RootCollection, defaultParams: () => any): GetUri<E> {
     return (ptr: E, params: { [key: string]: any }, e?: any) => {
         if (e && e.preventDefault) {
             e.preventDefault()
