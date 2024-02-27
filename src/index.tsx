@@ -407,3 +407,43 @@ export function createGo<E extends string>(routes: RootCollection, defaultParams
         }
     }
 }
+
+export function createGetUri<E extends string>(routes: RootCollection, defaultParams: () => any): Go<E> {
+    return (ptr: E, params: { [key: string]: any }, e?: any) => {
+        if (e && e.preventDefault) {
+            e.preventDefault()
+        }
+
+        const route = getRouteFromPtr(ptr.split('.'), routes)
+        if (route) {
+            route.params = {}
+            params = { ...defaultParams(), ...params }
+            const pattern = new UrlPattern(route.path) as any
+            let urlWithParams = pattern.stringify(params)
+
+            const keys = Object.keys(params)
+
+            let queryKeys: string[] = []
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i]
+
+                if (pattern.names.indexOf(key) === -1) {
+                    queryKeys.push(key)
+                }
+            }
+
+            if (queryKeys.length) {
+                let queryParams = {} as any
+                for (const key of queryKeys) {
+                    queryParams[key] = params[key]
+                }
+
+                urlWithParams += '?' + qs.stringify(queryParams)
+            }
+
+            return urlWithParams
+        } else {
+            console.log(`Route ${ptr} not found!`)
+        }
+    }
+}
