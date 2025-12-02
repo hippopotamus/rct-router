@@ -1,10 +1,10 @@
-import * as React from 'react'
-import * as UrlPattern from 'url-pattern'
+import React from 'react'
+import UrlPattern from 'url-pattern'
 import * as path from 'path'
 import * as qs from 'qs'
 import { ErrorView } from './ErrorView'
-import { NotFound } from './NotFound'
-import { EmptyTemplate } from './EmptyTemplate'
+import { NotFound } from './notFound'
+import { EmptyTemplate } from './emptyTemplate'
 
 let w: any = window
 
@@ -212,7 +212,7 @@ const TemplateBuilder = (props:TemplateBuilderProps)  =>{
 
         if (!Template) {
             return props.children
-        } else if (0 < templates.length) {
+        } else if (1 < templates.length) {
             return (
                 <Template route={props.route}>
                     <TemplateBuilder templates={templates.slice(1, templates.length)} route={props.route}>
@@ -370,6 +370,10 @@ export function createGo<E extends string>(routes: RootCollection, defaultParams
     return (ptr: E, params: { [key: string]: any }, e?: any) => {
         if (e && e.preventDefault) {
             e.preventDefault()
+        }
+
+        if (window.location.href.includes('/micro/')) {
+            ptr = ptr.replace('dashboard.', 'micro.') as E
         }
 
         const route = getRouteFromPtr(ptr.split('.'), routes)

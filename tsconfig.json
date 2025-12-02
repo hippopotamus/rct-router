@@ -1,21 +1,21 @@
 {
     "compilerOptions": {
         "outDir": "./dist/",
-        "target": "es5",
-        "module": "commonjs",
+        "target": "es2015",
+        "module": "esnext",
         "sourceMap": false,
         "noImplicitAny": true,
         "strictNullChecks": true,
         "declaration": true,
         "moduleResolution": "node",
-        "allowSyntheticDefaultImports": false,
+        "allowSyntheticDefaultImports": true,
         "experimentalDecorators": true,
         "jsx": "react",
         "noUnusedParameters": false,
         "noUnusedLocals": false,
         "lib": [
             "dom",
-            "es7"
+            "es2015"
         ]
     },
     "include": [
