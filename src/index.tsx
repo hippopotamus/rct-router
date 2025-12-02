@@ -417,6 +417,10 @@ export function createGetUri<E extends string>(routes: RootCollection, defaultPa
             e.preventDefault()
         }
 
+        if (window.location.href.includes('/micro/')) {
+            ptr = ptr.replace('dashboard.', 'micro.') as E
+        }
+
         const route = getRouteFromPtr(ptr.split('.'), routes)
         if (route) {
             route.params = {}
