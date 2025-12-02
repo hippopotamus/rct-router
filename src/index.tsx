@@ -289,55 +289,50 @@ const buildUrl = (href: string) => {
     return url.pathname + search
 }
 
-export class Router extends React.Component<RouterProps, RouterState> {
-    routes: RootCollection
+const routeTo = (url: string, collection: Collection | RootCollection, routes: RootCollection): RctRoute => {
+    url = 1 < url.length && url[url.length - 1] === '/' ? url.substring(0, url.length - 1) : url
 
-    constructor(props: RouterProps) {
-        super(props)
-        this.routes = props.routes
-        this.state = { route: this.routeTo(buildUrl(w.location.href), this.routes) }
+    for (const route of collection.routes) {
+        const routePath = route.path
+        const uri = 1 < routePath.length && routePath[routePath.length - 1] === '/' ? routePath.substring(0, routePath.length - 1) : routePath
 
+        const pattern = new UrlPattern(uri + '(/)')
+
+        const urlToMatch = url.indexOf('?') !== -1 ? url.substring(0, url.indexOf('?')) : url
+        const params = pattern.match(urlToMatch)
+
+        if (params) {
+            return route.addParams(params, url)
+        }
+    }
+
+    for (const subCollection of collection.collections) {
+        const pattern = new UrlPattern(path.join(subCollection.path, '*'))
+        const params = pattern.match(path.join(url, '/'))
+
+        if (params) {
+            return routeTo(url, subCollection, routes)
+        }
+    }
+
+    return new RctRoute({ name: 'notFound', path: '/not-found', component: routes.notFound })
+}
+
+export const Router: React.FC<RouterProps> = (props) => {
+    const routes = props.routes
+    const [route, setRoute] = React.useState<RctRoute>(() => routeTo(buildUrl(w.location.href), routes, routes))
+
+    React.useEffect(() => {
         w.onpopstate = () => {
-            this.setState({ route: this.routeTo(buildUrl(w.location.href), this.routes) })
+            setRoute(routeTo(buildUrl(w.location.href), routes, routes))
         }
 
         w.onpushstate = (url: string) => {
-            this.setState({ route: this.routeTo(url, this.routes) })
+            setRoute(routeTo(url, routes, routes))
         }
-    }
+    }, [routes])
 
-    routeTo(url: string, collection: Collection | RootCollection): RctRoute {
-        url = 1 < url.length && url[url.length - 1] === '/' ? url.substring(0, url.length - 1) : url
-
-        for (const route of collection.routes) {
-            const routePath = route.path
-            const uri = 1 < routePath.length && routePath[routePath.length - 1] === '/' ? routePath.substring(0, routePath.length - 1) : routePath
-
-            const pattern = new UrlPattern(uri + '(/)')
-
-            const urlToMatch = url.indexOf('?') !== -1 ? url.substring(0, url.indexOf('?')) : url
-            const params = pattern.match(urlToMatch)
-
-            if (params) {
-                return route.addParams(params, url)
-            }
-        }
-
-        for (const subCollection of collection.collections) {
-            const pattern = new UrlPattern(path.join(subCollection.path, '*'))
-            const params = pattern.match(path.join(url, '/'))
-
-            if (params) {
-                return this.routeTo(url, subCollection)
-            }
-        }
-
-        return new RctRoute({ name: 'notFound', path: '/not-found', component: this.routes.notFound })
-    }
-
-    render() {
-        return <RouteRenderer errorView={this.routes.error} route={this.state.route} />
-    }
+    return <RouteRenderer errorView={routes.error} route={route} />
 }
 
 const getRouteFromPtr = (ptrArr: Array<string>, collection: Collection | RootCollection): RctRoute | false => {

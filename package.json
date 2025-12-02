@@ -1,6 +1,6 @@
 {
   "name": "rct-router",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "a router for react",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -35,12 +35,12 @@
   "devDependencies": {
     "@types/node": "24.10.1",
     "@types/qs": "6.14.0",
-    "@types/react": "19.2.7",
+    "@types/react": "18.3.1",
     "typescript": "5.9.3"
   },
   "dependencies": {
     "qs": "6.14.0",
-    "react": "19.2.0",
+    "react": "18.3.1",
     "url-pattern": "1.0.3"
   }
 }
