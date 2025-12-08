@@ -206,8 +206,8 @@ export interface TemplateBuilderProps {
     templates: Array<React.ComponentClass<TemplateProps>>
 }
 
-const TemplateBuilder = (props:TemplateBuilderProps)  =>{
-        let templates = props.templates
+const TemplateBuilder: React.FC<TemplateBuilderProps> = (props) => {
+        const templates = props.templates
         const Template = templates[0]
 
         if (!Template) {
@@ -230,57 +230,52 @@ export interface RouteRendererProps {
     errorView: any
 }
 
-export interface RouteRendererState {
-    route: RctRoute | null
-}
+const RouteRenderer: React.FC<RouteRendererProps> = ({ route: propsRoute, errorView }) => {
+    const [route, setRoute] = React.useState<RctRoute | null>(null)
 
-class RouteRenderer extends React.Component<RouteRendererProps, RouteRendererState> {
-    state: RouteRendererState = { route: null }
+    React.useEffect(() => {
+        let isMounted = true
 
-    async beforeRender(route: RctRoute) {
-        for (const fn of route.beforeRender) {
-            const inject = await fn(route)
-            if (inject) {
-                route.replaceInject(inject)
+        const beforeRender = async (route: RctRoute) => {
+            for (const fn of route.beforeRender) {
+                const inject = await fn(route)
+                if (inject) {
+                    route.replaceInject(inject)
+                }
             }
+
+            return route
         }
 
-        return route
-    }
-
-    async componentDidMount() {
-        try {
-            const route = await this.beforeRender(this.props.route)
-            this.setState({ route })
-        } catch { }
-    }
-
-    async componentDidUpdate(prevProps: RouteRendererProps) {
-        if (prevProps.route.path !== this.props.route.path) {
+        const loadRoute = async () => {
             try {
-                const route = await this.beforeRender(this.props.route)
-                this.setState({ route })
+                const renderedRoute = await beforeRender(propsRoute)
+                if (isMounted) {
+                    setRoute(renderedRoute)
+                }
             } catch { }
         }
-    }
 
-    render() {
-        const ErrorView = this.props.errorView
+        loadRoute()
 
-        const route = this.state.route
-        if (!route) {
-            return null
+        return () => {
+            isMounted = false
         }
+    }, [propsRoute.urn, propsRoute.path, JSON.stringify(propsRoute.params)])
 
-        const ComponentToRender = route.Component
-        return (
-            <ErrorView>
-                <TemplateBuilder templates={route.templates} route={route.formatForInject()}>
-                    <ComponentToRender route={route.formatForInject()} />
-                </TemplateBuilder>
-            </ErrorView>
-        )
+    if (!route) {
+        return null
     }
+
+    const ErrorView = errorView
+
+    return (
+        <ErrorView>
+            <TemplateBuilder templates={route.templates} route={route.formatForInject()}>
+                <route.Component route={route.formatForInject()} />
+            </TemplateBuilder>
+        </ErrorView>
+    )
 }
 
 const buildUrl = (href: string) => {
@@ -302,7 +297,9 @@ const routeTo = (url: string, collection: Collection | RootCollection, routes: R
         const params = pattern.match(urlToMatch)
 
         if (params) {
-            return route.addParams(params, url)
+            // Clone the route to avoid mutating the shared instance
+            const newRoute = Object.assign(Object.create(Object.getPrototypeOf(route)), route)
+            return newRoute.addParams(params, url)
         }
     }
 
@@ -323,14 +320,23 @@ export const Router: React.FC<RouterProps> = (props) => {
     const [route, setRoute] = React.useState<RctRoute>(() => routeTo(buildUrl(w.location.href), routes, routes))
 
     React.useEffect(() => {
-        w.onpopstate = () => {
-            setRoute(routeTo(buildUrl(w.location.href), routes, routes))
+        const handlePopState = () => {
+            const newRoute = routeTo(buildUrl(w.location.href), routes, routes)
+            setRoute(newRoute)
         }
 
-        w.onpushstate = (url: string) => {
-            setRoute(routeTo(url, routes, routes))
+        const handlePushState = (url: string) => {
+            const newRoute = routeTo(url, routes, routes)
+            setRoute(newRoute)
         }
-    }, [routes])
+
+        w.addEventListener('popstate', handlePopState)
+        w.onpushstate = handlePushState
+
+        return () => {
+            w.removeEventListener('popstate', handlePopState)
+        }
+    }, [])
 
     return <RouteRenderer errorView={routes.error} route={route} />
 }
