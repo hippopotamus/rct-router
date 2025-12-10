@@ -1,10 +1,10 @@
 import React from 'react'
 import UrlPattern from 'url-pattern'
 import * as path from 'path'
-import * as qs from 'qs'
+import qs from 'qs'
 import { ErrorView } from './ErrorView'
-import { NotFound } from './notFound'
-import { EmptyTemplate } from './emptyTemplate'
+import { NotFound } from './NotFound'
+import { EmptyTemplate } from './EmptyTemplate'
 
 let w: any = window
 
